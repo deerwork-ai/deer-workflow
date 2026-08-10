@@ -347,6 +347,7 @@ bun run check
 | `bun run lint:staged`   | 对 Git 暂存文件运行 pre-commit 检查。              |
 | `bun run prepare`       | 安装仓库管理的 Husky Hooks。                       |
 | `bun test`              | 运行顶层 `tests/` 目录下的全部测试。               |
+| `bun run test:coverage` | 运行全部测试并输出 Bun 覆盖率报告。                |
 | `bun run typecheck`     | 对 `src/` 和 `tests/` 执行类型检查，但不输出文件。 |
 | `bun run check`         | 运行类型检查、Lint、格式检查和全部测试。           |
 
