@@ -173,6 +173,7 @@ The root `package.json` is the source of truth for project commands:
 | `bun run lint:staged`   | Run the pre-commit checks against Git-staged files.                      |
 | `bun run prepare`       | Install the repository-managed Husky hooks.                              |
 | `bun test`              | Run every test under the top-level `tests/` directory.                   |
+| `bun run test:coverage` | Run every test and print the Bun coverage report.                        |
 | `bun run typecheck`     | Type-check both `src/` and `tests/` without emitting files.              |
 | `bun run check`         | Run type-checking, lint, format checks, and the complete test suite.     |
 
