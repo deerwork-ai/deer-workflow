@@ -1,5 +1,6 @@
 import { isAbsolute, resolve } from "node:path";
 
+import { resolveExecutable } from "./resolve-executable";
 import type {
   Agent,
   AgentOptions,
@@ -120,9 +121,9 @@ export class ClaudeAgent implements Agent {
     }
 
     options.signal?.throwIfAborted();
-    this.#assertCommandAvailable();
+    const resolvedCommand = this.#resolveCommandOrThrow();
 
-    const command = this.#buildCommand(options);
+    const command = this.#buildCommand(options, resolvedCommand);
     const cwd = resolve(options.cwd ?? this.#config.cwd ?? process.cwd());
     const subprocess = Bun.spawn(command, {
       cwd,
@@ -188,10 +189,12 @@ export class ClaudeAgent implements Agent {
     }
   }
 
-  #assertCommandAvailable(): void {
-    if (Bun.which(this.#config.command) === null) {
+  #resolveCommandOrThrow(): string {
+    const resolved = resolveExecutable(this.#config.command);
+    if (resolved === null) {
       throw new ClaudeCliNotFoundError(this.#config.command);
     }
+    return resolved;
   }
 
   #parseResultMessage(
@@ -208,9 +211,9 @@ export class ClaudeAgent implements Agent {
     }
   }
 
-  #buildCommand(options: AgentOptions): string[] {
+  #buildCommand(options: AgentOptions, resolvedCommand: string): string[] {
     const command = [
-      this.#config.command,
+      resolvedCommand,
       ...this.#config.commandArgs,
       "--print",
       "--output-format",

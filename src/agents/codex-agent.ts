@@ -2,6 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, resolve } from "node:path";
 
+import { resolveExecutable } from "./resolve-executable";
 import type {
   Agent,
   AgentOptions,
@@ -123,7 +124,7 @@ export class CodexAgent implements Agent {
     }
 
     options.signal?.throwIfAborted();
-    this.#assertCommandAvailable();
+    const resolvedCommand = this.#resolveCommandOrThrow();
 
     const temporaryDirectory = await mkdtemp(
       join(tmpdir(), "deer-workflow-codex-"),
@@ -132,7 +133,12 @@ export class CodexAgent implements Agent {
     const schemaPath = join(temporaryDirectory, "output-schema.json");
 
     try {
-      const command = this.#buildCommand(options, outputPath, schemaPath);
+      const command = this.#buildCommand(
+        options,
+        resolvedCommand,
+        outputPath,
+        schemaPath,
+      );
 
       if (options.schema) {
         await writeFile(
@@ -202,19 +208,22 @@ export class CodexAgent implements Agent {
     }
   }
 
-  #assertCommandAvailable(): void {
-    if (Bun.which(this.#config.command) === null) {
+  #resolveCommandOrThrow(): string {
+    const resolved = resolveExecutable(this.#config.command);
+    if (resolved === null) {
       throw new CodexCliNotFoundError(this.#config.command);
     }
+    return resolved;
   }
 
   #buildCommand(
     options: AgentOptions,
+    resolvedCommand: string,
     outputPath: string,
     schemaPath: string,
   ): string[] {
     const command = [
-      this.#config.command,
+      resolvedCommand,
       ...this.#config.commandArgs,
       "exec",
       "--color",

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Fixed `ENOENT: no such file or directory, uv_spawn` when running
+  `CodexAgent` or `ClaudeAgent` on Windows. Both now resolve the configured
+  command through its `.exe`/`.cmd`/`.bat` sibling before spawning, instead of
+  handing `Bun.spawn` the bare, extension-less npm shim name it cannot
+  execute directly.
 - Removed the general-purpose `deer-workflow agent` CLI command. Agent runtime
   selection remains available on `deer-workflow create`.
 
