@@ -36,8 +36,8 @@ Deer Workflow 是一种代码优先的
 
 - **代码即计划。** 控制流、阶段、输入和失败处理都存在于可审阅的 TypeScript
   中，而不是隐藏在不透明的 Agent 对话里。
-- **Agent 可替换。** Codex 是默认 Runtime，内置支持 Claude Code 与 Pi，而公共
-  Agent 接口保持厂商中立。
+- **Agent 可替换。** Codex 是默认 Runtime，内置支持 Claude Code、DeepSeek
+  Harness 与 Pi，而公共 Agent 接口保持厂商中立。
 - **执行可观察。** 交互式运行提供感知阶段状态的 TUI；自动化系统则可以消费
   稳定的 JSONL Event Stream。
 
@@ -62,8 +62,8 @@ deer-workflow create \
   > workflow.ts
 ```
 
-如需使用其他已安装的 Harness 生成，可添加 `--agent claude` 或 `--agent pi`；
-默认值仍是 Codex。
+如需使用其他已安装的 Harness 生成，可添加 `--agent claude`、`--agent dsh`
+（DeepSeek Harness）或 `--agent pi`；默认值仍是 Codex。
 
 使用示例输入运行生成的 Workflow：
 
@@ -122,8 +122,9 @@ bun run check
 
 ## 参与贡献
 
-Codex CLI 是默认 Agent Runtime，但不是架构依赖。`ClaudeAgent` 与 `PiAgent`
-均为内置 Harness；欢迎为其他 Coding Agent 贡献集成。
+Codex CLI 是默认 Agent Runtime，但不是架构依赖。`ClaudeAgent`、
+`DeepSeekHarnessAgent` 与 `PiAgent` 均为内置 Harness；欢迎为其他 Coding
+Agent 贡献集成。
 
 完整命令参考请参阅[快速入门指南](./docs/index.zh-CN.md#开发仓库)。
 

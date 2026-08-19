@@ -34,8 +34,9 @@ Deer Workflow is a code-first implementation of **[Graph Engineering](https://ww
 
 - **Code is the plan.** Control flow, phases, inputs, and failure handling live
   in reviewable TypeScript rather than an opaque Agent conversation.
-- **Agents are replaceable.** Codex is the default runtime; Claude Code and Pi
-  are built in; and the public Agent interface remains vendor-neutral.
+- **Agents are replaceable.** Codex is the default runtime; Claude Code,
+  DeepSeek Harness, and Pi are built in; and the public Agent interface
+  remains vendor-neutral.
 - **Execution is observable.** Interactive runs provide a phase-aware TUI;
   automation can consume a stable JSONL event stream.
 
@@ -60,8 +61,8 @@ deer-workflow create \
   > workflow.ts
 ```
 
-Use `--agent claude` or `--agent pi` to generate with another installed
-Harness. Codex remains the default.
+Use `--agent claude`, `--agent dsh` (DeepSeek Harness), or `--agent pi` to
+generate with another installed Harness. Codex remains the default.
 
 Run the generated Workflow with its example input:
 
@@ -127,8 +128,8 @@ bun run check
 ## Contribute
 
 Codex CLI is the default Agent runtime, not an architectural dependency.
-`ClaudeAgent` and `PiAgent` ship as built-in Harnesses; integrations for other
-Coding Agents are welcome.
+`ClaudeAgent`, `DeepSeekHarnessAgent`, and `PiAgent` ship as built-in
+Harnesses; integrations for other Coding Agents are welcome.
 
 See the [Getting Started guide](./docs/index.md#develop-the-repository) for the
 full command reference.

@@ -81,6 +81,14 @@ pi auth check
 pi --version
 ```
 
+DeepSeek Harness is supported as well. Install the official CLI, then use
+`create --agent dsh`:
+
+```bash
+bun install --global @deepseek-ai/dsh
+dsh --version
+```
+
 ## Create your first Workflow
 
 Describe the orchestration rather than its implementation:

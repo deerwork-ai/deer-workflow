@@ -335,6 +335,71 @@ executable throws `PiCliNotFoundError` before temporary files are created and
 includes installation and authentication steps for Pi 0.84.1. Per-run
 extensions and policy files are removed after success, failure, or abort.
 
+### `DeepSeekHarnessAgent`
+
+```typescript
+class DeepSeekHarnessAgent implements Agent {
+  constructor(config?: DeepSeekHarnessAgentConfig);
+
+  run<TOutput = string>(
+    prompt: string,
+    options?: AgentOptions,
+  ): Promise<TOutput>;
+}
+```
+
+An Agent Harness backed by the non-interactive
+`dsh --profile headless "<task>"` command from
+[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). Each run
+answers one task, prints the final assistant message to stdout, and exits.
+The headless surface has no stdin prompt channel, so the task travels as a
+command-line argument; processes are still spawned with argument arrays and
+never through a shell.
+
+```typescript
+import { DeepSeekHarnessAgent } from "@deerwork-ai/deer-workflow/agents";
+
+const runtime = new DeepSeekHarnessAgent();
+const result = await runtime.run("Inspect this repository.", {
+  sandbox: "read-only",
+});
+```
+
+```typescript
+interface DeepSeekHarnessAgentConfig {
+  command?: string;
+  commandArgs?: string[];
+  cwd?: string;
+  sandbox?: AgentSandbox;
+  extraArgs?: string[];
+  env?: Record<string, string | undefined>;
+}
+```
+
+`AgentOptions.sandbox` maps one-to-one onto DeepSeek Harness's
+`DSH_PERMISSION_MODE` environment variable: `"read-only"`, `"workspace-write"`,
+and `"danger-full-access"` share the shared policy names verbatim. When
+`sandbox` is omitted, `DSH_PERMISSION_MODE` is left untouched and DeepSeek
+Harness applies its own `workspace-write` default.
+
+The model cannot be overridden per run because the headless surface has no
+model flag: DeepSeek Harness resolves it from the `agent-default-model`
+setting in `$DSH_HOME/settings.yaml`. Supplying `AgentOptions.model` therefore
+throws a `TypeError` instead of being silently ignored, as does
+`AgentOptions.additionalWritableDirectories` (writes stay confined to the
+session workspace and platform temporary roots).
+
+`AgentOptions.schema` is embedded as a structured-output contract in the task,
+and `DeepSeekHarnessAgent` parses the JSON object from the final message,
+tolerating surrounding prose or Markdown fences. Session records persist under
+`$DSH_HOME` for audit; there is no ephemeral-session switch.
+
+Process failures and missing structured results throw
+`DeepSeekHarnessAgentError`, which retains `exitCode`, `stdout`, and `stderr`.
+A missing executable throws `DeepSeekHarnessCliNotFoundError` before a process
+starts and includes the `bun install --global @deepseek-ai/dsh` installation
+step.
+
 ## Flow
 
 ### `parallel()`

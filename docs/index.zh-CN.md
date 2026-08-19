@@ -77,6 +77,13 @@ pi auth check
 pi --version
 ```
 
+同样支持 DeepSeek Harness。安装官方 CLI 后，可使用 `create --agent dsh`：
+
+```bash
+bun install --global @deepseek-ai/dsh
+dsh --version
+```
+
 ## 创建第一个 Workflow
 
 描述编排目标，而不是具体实现：

@@ -1,6 +1,11 @@
 #!/usr/bin/env bun
 
-import { ClaudeAgentError, CodexAgentError, PiAgentError } from "./agents";
+import {
+  ClaudeAgentError,
+  CodexAgentError,
+  DeepSeekHarnessAgentError,
+  PiAgentError,
+} from "./agents";
 import { runCreateCommand } from "./cli/create";
 import { CliUsageError } from "./cli/errors";
 import { runWorkflowCommand } from "./cli/run";
@@ -27,6 +32,7 @@ try {
   if (
     error instanceof CodexAgentError ||
     error instanceof ClaudeAgentError ||
+    error instanceof DeepSeekHarnessAgentError ||
     error instanceof PiAgentError
   ) {
     console.error(error.message);
@@ -45,8 +51,8 @@ function printUsage(): void {
   console.log(`deer-workflow
 
 Usage:
-  deer-workflow create [--agent codex|claude|pi] "Describe the Workflow"
-  echo "Describe the Workflow" | deer-workflow create [--agent codex|claude|pi]
+  deer-workflow create [--agent codex|claude|dsh|pi] "Describe the Workflow"
+  echo "Describe the Workflow" | deer-workflow create [--agent codex|claude|dsh|pi]
   deer-workflow skill install
   deer-workflow run <workflow> [--print] [--input '<json>']
   deer-workflow run <workflow> [--input-file <path>]
@@ -58,6 +64,6 @@ Commands:
   run     Execute a Workflow module
 
 Agent selection:
-  --agent <codex|claude|pi>  Agent runtime for create (default: codex)
+  --agent <codex|claude|dsh|pi>  Agent runtime for create (default: codex)
 `);
 }

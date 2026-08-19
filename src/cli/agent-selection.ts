@@ -1,6 +1,6 @@
 import { CliUsageError } from "./errors";
 
-export type CliAgentName = "claude" | "codex" | "pi";
+export type CliAgentName = "claude" | "codex" | "dsh" | "pi";
 
 interface ParsedAgentSelection {
   readonly agentName: CliAgentName;
@@ -42,9 +42,14 @@ export function parseAgentSelection(
       index += 1;
     }
 
-    if (selected !== "codex" && selected !== "claude" && selected !== "pi") {
+    if (
+      selected !== "codex" &&
+      selected !== "claude" &&
+      selected !== "dsh" &&
+      selected !== "pi"
+    ) {
       throw new CliUsageError(
-        `Invalid --agent value: ${selected || "(missing)"}. Expected codex, claude, or pi.`,
+        `Invalid --agent value: ${selected || "(missing)"}. Expected codex, claude, dsh, or pi.`,
       );
     }
     agentName = selected;
@@ -63,6 +68,9 @@ export function parseAgentSelection(
 export function formatAgentName(agentName: CliAgentName): string {
   if (agentName === "claude") {
     return "Claude";
+  }
+  if (agentName === "dsh") {
+    return "DeepSeek Harness";
   }
   return agentName === "pi" ? "Pi" : "Codex";
 }

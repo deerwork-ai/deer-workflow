@@ -118,6 +118,32 @@ console.log(JSON.stringify({ type: "agent_end", messages: [] }));
     "utf8",
   );
   await chmod(piStubPath, 0o755);
+  const dshStubPath = join(temporaryDirectory, "dsh");
+  await writeFile(
+    dshStubPath,
+    `#!/usr/bin/env bun
+const args = Bun.argv.slice(2);
+
+if (args[0] !== "--profile" || args[1] !== "headless") {
+  console.error("missing --profile headless launcher arguments");
+  process.exit(5);
+}
+
+const task = args[args.length - 1];
+
+if (!task.includes("STRUCTURED OUTPUT CONTRACT") || !task.includes("JSON Schema")) {
+  console.error("create must embed the schema contract in the dsh task");
+  process.exit(8);
+}
+
+console.log(JSON.stringify({
+  source: task,
+  exampleArgsJson: JSON.stringify({ topic: "Example topic" }),
+}));
+`,
+    "utf8",
+  );
+  await chmod(dshStubPath, 0o755);
 });
 
 afterAll(async () => {
@@ -192,6 +218,26 @@ describe("deer-workflow create", () => {
     );
   });
 
+  test("generates through DeepSeek Harness when selected", async () => {
+    const result = await runCli([
+      "create",
+      "--agent",
+      "dsh",
+      "Research",
+      "three",
+      "markets",
+    ]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toBe("");
+    expect(result.stdout).toStartWith(
+      "/* Generating a DeerFlow Dynamic Workflow with DeepSeek Harness */\n",
+    );
+    expect(result.stdout).toContain(
+      "--- USER REQUEST ---\nResearch three markets",
+    );
+  });
+
   test("rejects an empty prompt", async () => {
     const result = await runCli(["create"]);
 
@@ -207,10 +253,10 @@ describe("deer-workflow create", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain(
-      "deer-workflow create [--agent codex|claude|pi]",
+      "deer-workflow create [--agent codex|claude|dsh|pi]",
     );
     expect(result.stdout).toContain(
-      "--agent <codex|claude|pi>  Agent runtime (default: codex)",
+      "--agent <codex|claude|dsh|pi>  Agent runtime (default: codex)",
     );
   });
 
@@ -219,13 +265,13 @@ describe("deer-workflow create", () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain(
-      "deer-workflow create [--agent codex|claude|pi]",
+      "deer-workflow create [--agent codex|claude|dsh|pi]",
     );
     expect(result.stdout).toContain(
       "create  Generate a Workflow with the bundled workflow-creator Skill",
     );
     expect(result.stdout).toContain(
-      "--agent <codex|claude|pi>  Agent runtime for create (default: codex)",
+      "--agent <codex|claude|dsh|pi>  Agent runtime for create (default: codex)",
     );
     expect(result.stdout).not.toContain("deer-workflow agent");
   });
