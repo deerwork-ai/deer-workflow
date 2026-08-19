@@ -319,6 +319,64 @@ Pi 0.84.1 不提供操作系统 Sandbox，因此 `PiAgent` 对共享策略采用
 `PiCliNotFoundError`，其中包含 Pi 0.84.1 的安装和认证步骤。每次运行生成的
 Extension 与策略文件都会在成功、失败或取消后删除。
 
+### `DeepSeekHarnessAgent`
+
+```typescript
+class DeepSeekHarnessAgent implements Agent {
+  constructor(config?: DeepSeekHarnessAgentConfig);
+
+  run<TOutput = string>(
+    prompt: string,
+    options?: AgentOptions,
+  ): Promise<TOutput>;
+}
+```
+
+由 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的非交互
+`dsh --profile headless "<task>"` 命令支撑的 Agent Harness。每次运行回答一个
+任务，把最终助手消息打印到 stdout 后退出。headless 表面没有 stdin 提示通道，
+因此任务以命令行参数传递；进程仍以参数数组启动，绝不经过 shell。
+
+```typescript
+import { DeepSeekHarnessAgent } from "@deerwork-ai/deer-workflow/agents";
+
+const runtime = new DeepSeekHarnessAgent();
+const result = await runtime.run("Inspect this repository.", {
+  sandbox: "read-only",
+});
+```
+
+```typescript
+interface DeepSeekHarnessAgentConfig {
+  command?: string;
+  commandArgs?: string[];
+  cwd?: string;
+  sandbox?: AgentSandbox;
+  extraArgs?: string[];
+  env?: Record<string, string | undefined>;
+}
+```
+
+`AgentOptions.sandbox` 与 DeepSeek Harness 的 `DSH_PERMISSION_MODE` 环境变量
+一一对应：`"read-only"`、`"workspace-write"` 和 `"danger-full-access"` 与共享
+策略名逐字相同。省略 `sandbox` 时不改动 `DSH_PERMISSION_MODE`，由 DeepSeek
+Harness 应用自身的 `workspace-write` 默认值。
+
+模型无法按次覆盖，因为 headless 表面没有模型参数：DeepSeek Harness 从
+`$DSH_HOME/settings.yaml` 的 `agent-default-model` 设置解析模型。因此提供
+`AgentOptions.model` 会抛出 `TypeError` 而不是被静默忽略；
+`AgentOptions.additionalWritableDirectories` 同样抛出（写入始终限制在会话
+工作区和平台临时根目录内）。
+
+`AgentOptions.schema` 作为结构化输出契约嵌入任务，`DeepSeekHarnessAgent`
+从最终消息解析 JSON 对象，容忍周围的说明文字或 Markdown 围栏。会话记录保留
+在 `$DSH_HOME` 下供审计；没有临时会话开关。
+
+进程失败或缺少结构化结果时抛出 `DeepSeekHarnessAgentError`，并保留
+`exitCode`、`stdout` 和 `stderr`。找不到可执行文件时，会在启动进程前抛出
+`DeepSeekHarnessCliNotFoundError`，其中包含
+`bun install --global @deepseek-ai/dsh` 安装步骤。
+
 ## Flow
 
 ### `parallel()`

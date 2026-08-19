@@ -271,3 +271,63 @@ export interface PiAgentErrorDetails {
   stdout: string;
   stderr: string;
 }
+
+/**
+ * Construction options for {@link DeepSeekHarnessAgent}.
+ */
+export interface DeepSeekHarnessAgentConfig {
+  /**
+   * DeepSeek Harness executable name or absolute path. Defaults to `dsh`.
+   */
+  command?: string;
+
+  /**
+   * Arguments inserted between the executable and `--profile headless`.
+   * Launcher-level options such as `--patch` belong here.
+   */
+  commandArgs?: string[];
+
+  /** Default working directory for Agent runs. */
+  cwd?: string;
+
+  /**
+   * Default DeepSeek Harness permission policy. Applied through the
+   * `DSH_PERMISSION_MODE` environment variable.
+   */
+  sandbox?: AgentSandbox;
+
+  /**
+   * Additional raw arguments inserted after `--profile headless` and before
+   * the task.
+   */
+  extraArgs?: string[];
+
+  /** Environment variables applied to every DeepSeek Harness process. */
+  env?: Record<string, string | undefined>;
+}
+
+/**
+ * Fully normalized DeepSeek Harness Agent configuration.
+ *
+ * @internal
+ */
+export interface ResolvedDeepSeekHarnessAgentConfig {
+  command: string;
+  commandArgs: string[];
+  cwd?: string;
+  sandbox?: AgentSandbox;
+  extraArgs: string[];
+  env?: Record<string, string | undefined>;
+}
+
+/**
+ * Captured process details used to construct a
+ * {@link DeepSeekHarnessAgentError}.
+ *
+ * @internal
+ */
+export interface DeepSeekHarnessAgentErrorDetails {
+  exitCode: number;
+  stdout: string;
+  stderr: string;
+}

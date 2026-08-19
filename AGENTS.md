@@ -23,8 +23,9 @@ Do not copy private or proprietary implementations. Reproduce public behavior th
   bundled `skills/workflow-creator/SKILL.md`, appends the user prompt, and
   writes only generated source to stdout.
 - Keep Codex as the default CLI Agent runtime. Let the `create` command select
-  Codex, Claude Code, or Pi with `--agent codex|claude|pi`. Document the option
-  and its Codex default in top-level and `create` help.
+  Codex, Claude Code, DeepSeek Harness, or Pi with
+  `--agent codex|claude|dsh|pi`. Document the option and its Codex default in
+  top-level and `create` help.
 - Resolve the [bundled Skill](./skills/workflow-creator/) relative to the
   installed CLI module so `create` works from a global GitHub or npm
   installation. Do not depend on the caller having installed
@@ -56,6 +57,8 @@ Do not copy private or proprietary implementations. Reproduce public behavior th
 - Keep Codex-specific process handling in `src/agents/codex-agent.ts`.
 - Keep Pi-specific process, structured-output, and tool-policy handling in
   `src/agents/pi-agent.ts`.
+- Keep DeepSeek Harness-specific process and structured-output handling in
+  `src/agents/deepseek-harness-agent.ts`.
 - Detect a missing Codex executable before creating temporary files or starting
   a process. The error must include official CLI installation steps and state
   that Codex CLI and Codex Desktop are separate installations.

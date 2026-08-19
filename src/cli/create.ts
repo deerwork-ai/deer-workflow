@@ -2,7 +2,12 @@ import { access } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ClaudeAgent, CodexAgent, PiAgent } from "../agents";
+import {
+  ClaudeAgent,
+  CodexAgent,
+  DeepSeekHarnessAgent,
+  PiAgent,
+} from "../agents";
 import type { AgentFunction, JsonSchema, JsonValue } from "../agents";
 import { TerminalUI } from "../tui";
 import { formatAgentName, parseAgentSelection } from "./agent-selection";
@@ -60,9 +65,11 @@ export async function runCreateCommand(
   const selectedRuntime =
     selection.agentName === "claude"
       ? new ClaudeAgent()
-      : selection.agentName === "pi"
-        ? new PiAgent()
-        : defaultCreateAgent;
+      : selection.agentName === "dsh"
+        ? new DeepSeekHarnessAgent()
+        : selection.agentName === "pi"
+          ? new PiAgent()
+          : defaultCreateAgent;
   const selectedAgent: AgentFunction =
     runAgent ?? ((prompt, options) => selectedRuntime.run(prompt, options));
   const agentName = formatAgentName(selection.agentName);
@@ -177,11 +184,11 @@ function parseExampleArgsJson(
  */
 export function printCreateUsage(): void {
   console.log(`Usage:
-  deer-workflow create [--agent codex|claude|pi] "Describe the Workflow"
-  echo "Describe the Workflow" | deer-workflow create [--agent codex|claude|pi]
+  deer-workflow create [--agent codex|claude|dsh|pi] "Describe the Workflow"
+  echo "Describe the Workflow" | deer-workflow create [--agent codex|claude|dsh|pi]
 
 Options:
-  --agent <codex|claude|pi>  Agent runtime (default: codex)
+  --agent <codex|claude|dsh|pi>  Agent runtime (default: codex)
 
 Output:
   stdout  Generated Workflow source

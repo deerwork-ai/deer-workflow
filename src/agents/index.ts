@@ -8,6 +8,7 @@ export type {
   AgentSandbox,
   ClaudeAgentConfig,
   CodexAgentConfig,
+  DeepSeekHarnessAgentConfig,
   JsonPrimitive,
   JsonSchema,
   JsonValue,
@@ -23,6 +24,11 @@ export {
   CodexAgentError,
   CodexCliNotFoundError,
 } from "./codex-agent";
+export {
+  DeepSeekHarnessAgent,
+  DeepSeekHarnessAgentError,
+  DeepSeekHarnessCliNotFoundError,
+} from "./deepseek-harness-agent";
 export { PiAgent, PiAgentError, PiCliNotFoundError } from "./pi-agent";
 
 /**
